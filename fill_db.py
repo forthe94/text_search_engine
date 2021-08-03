@@ -1,8 +1,9 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from model import Document
+from settings import DB_URL
 
-engine = create_engine('sqlite:///test.db')
+engine = create_engine(DB_URL)
 
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -15,7 +16,7 @@ documents = [Document(rubrics='Science, Tech, IT', text='A comparison of the act
                                                         'Peter Gabriel, “Solsbury Hill.”')
 
              ]
-
-for doc in documents:
-    session.add(doc)
-session.commit()
+if __name__ == '__main__':
+    for doc in documents:
+        session.add(doc)
+    session.commit()

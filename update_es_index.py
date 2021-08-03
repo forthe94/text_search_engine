@@ -2,14 +2,21 @@ from elasticsearch import Elasticsearch
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from model import Document
+from settings import DB_URL
 
-es = Elasticsearch()
-engine = create_engine('sqlite:///test.db')
-Session = sessionmaker(bind=engine)
-session = Session()
 
-for instance in session.query(Document).order_by(Document.id):
-    res = es.index(index='text_search', id=instance.id, body={'text': instance.text})
+def update_es_index(es, session):
+    """
+    Updates ElasticSearch index from database.
+    """
+    es.indices.delete(index='text_search', ignore=[400, 404])
 
-print(es.search(index='text_search', body={"query": {"match": {'text': 'of the volcano'}}}))
+    for instance in session.query(Document).order_by(Document.id):
+        es.index(index='text_search', id=instance.id, body={'text': instance.text})
 
+
+if __name__ == '__main__':
+    engine = create_engine(DB_URL)
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    update_es_index(Elasticsearch(), ses)

@@ -1,4 +1,8 @@
 from sqlalchemy import create_engine
 from model import Document, Base
-engine = create_engine('sqlite:///test.db')
-Base.metadata.create_all(engine)
+from settings import DB_URL
+
+
+if __name__ == '__main__':
+    engine = create_engine(DB_URL)
+    Base.metadata.create_all(engine)
